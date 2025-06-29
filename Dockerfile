@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:python3.13-alpine
+FROM python:3.13.5-alpine3.22
 
 WORKDIR /code
 
@@ -7,6 +7,6 @@ RUN apk add --no-cache curl
 COPY ./requirements.txt /code/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-COPY ./src /code
+COPY ./src /code/src
 
-CMD ["fastapi", "run", "main.py", "--proxy-headers", "--port", "80"]
+CMD ["fastapi", "run", "src/main.py", "--proxy-headers", "--port", "80"]
