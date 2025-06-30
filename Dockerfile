@@ -1,7 +1,6 @@
 FROM ghcr.io/astral-sh/uv:python3.13-alpine
 
-ENV PORT=8000
-ENV WORKERS=4
+ENV PORT 8000
 
 RUN apk add --no-cache curl
 
@@ -15,4 +14,4 @@ COPY src .
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:${PORT}/healthcheck || exit 1
 
-CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "${PORT}"]
