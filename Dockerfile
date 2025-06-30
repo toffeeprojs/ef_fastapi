@@ -1,12 +1,18 @@
-FROM python:3.13.5-alpine3.22
+FROM ghcr.io/astral-sh/uv:python3.13-alpine
 
-WORKDIR /code
+ENV PORT=8000
+ENV WORKERS=4
 
 RUN apk add --no-cache curl
 
-COPY ./requirements.txt /code/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+WORKDIR /code
 
-COPY ./src /code/src
+COPY requirements.txt .
+RUN uv pip install --system --no-cache -r requirements.txt
 
-CMD ["fastapi", "run", "src/main.py", "--proxy-headers", "--port", "80"]
+COPY src .
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:${PORT}/healthcheck || exit 1
+
+CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
