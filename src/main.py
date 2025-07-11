@@ -1,13 +1,12 @@
 from fastapi import FastAPI
 
+from handlers import route as handlers
+
 app = FastAPI()
 
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+app.include_router(handlers)
 
 
-@app.get("/healthcheck")
-async def health_check():
+@app.get("/health")
+async def health_check() -> str:
     return "Ok"
