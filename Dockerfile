@@ -22,6 +22,6 @@ COPY src src
 RUN uv sync --locked
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD "curl -f http://localhost:${PORT}${ROOT_PATH}/health || exit 1"
+  CMD ["/bin/sh", "-c", "curl -f http://localhost:${PORT}/health || exit 1"]
 
 CMD ["/bin/sh", "-c", "uv run fastapi run src/main.py --proxy-headers --port ${PORT} --workers ${WORKERS} --root-path ${ROOT_PATH}"]
