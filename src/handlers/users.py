@@ -1,57 +1,45 @@
-from typing import Annotated, Optional
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Path, HTTPException, Depends
 from pydantic import BaseModel, Field
 from decimal import Decimal
 
-route = APIRouter(
+from common_lib.postgres import PostgresManager
+from depends import get_postgres
+
+
+router = APIRouter(
     prefix="/users"
 )
 
 
-class UserExchangePath(BaseModel):
-    user_id: int
-
-    currency_give: Annotated[
-        str,
-        Field(
-            min_length=3,
-            max_length=5,
-            pattern=r"^[A-Z0-9]{3,5}$",
-            validation_alias="give"
-        )
-    ]
-    currency_get: Annotated[
-        str,
-        Field(
-            min_length=3,
-            max_length=5,
-            pattern=r"^[A-Z0-9]{3,5}$",
-            validation_alias="get"
-        )
-    ]
-
-class UserExchangeModel(BaseModel):
-    rate: Annotated[
-        Decimal,
-        Field(
-            max_digits=15,
-            decimal_places=6
-        )
-    ]
-
-    comment: Annotated[
-        str,
-        Field(
-            max_length=512
-        )
-    ] | None
+class UserExchange(BaseModel):
+    distance: float
+    rate: Decimal = Field(
+        max_digits=15,
+        decimal_places=6
+    )
+    comment: str | None = Field(
+        max_length=512
+    )
 
 
-@route.get("/{user_id}/exchange/{give}-{get}", response_model=Optional[UserExchangeModel])
-async def user_exchange(path: UserExchangePath = Depends()) -> Optional[UserExchangeModel]:
+@router.get("/{user_telegram_id}/exchange/{currency_give}-{currency_get}", response_model=UserExchange)
+async def user_exchange(
+    user_telegram_id: int,
+    currency_give: str = Path(
+        min_length=3,
+        max_length=5,
+        pattern=r"^[A-Z0-9]{3,5}$",
+    ),
+    currency_get: str = Path(
+        min_length=3,
+        max_length=5,
+        pattern=r"^[A-Z0-9]{3,5}$",
+    ),
+    postgres_manager: PostgresManager = Depends(get_postgres),
+) -> UserExchange:
     raise HTTPException(status_code=404)
 
 
 __all__ = [
-    "route"
+    "router"
 ]

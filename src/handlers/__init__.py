@@ -1,20 +1,20 @@
 from fastapi import APIRouter
 
-from .exchanges import route as exchange
-from .users import route as user
-from .health import route as health
-
-route = APIRouter(prefix="/v1")
+from .exchanges import router as exchange
+from .users import router as user
+from .health import router as health
 
 
-for router in [
+router = APIRouter()
+
+for r in [
     exchange,
     user,
     health
 ]:
-    route.include_router(router)
+    router.include_router(r)
 
 
 __all__ = [
-    "route"
+    "router"
 ]

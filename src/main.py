@@ -1,12 +1,8 @@
 from fastapi import FastAPI
 
-from handlers import route as handlers
+from handlers import router as handlers
+from depends import depends_lifespan
 
-app = FastAPI()
 
+app = FastAPI(lifespan=depends_lifespan)
 app.include_router(handlers)
-
-
-@app.get("/health")
-async def health_check() -> str:
-    return "Ok"
